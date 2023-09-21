@@ -1,0 +1,22 @@
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: /home/aka/visual-search/DeepFashion2  # dataset root dir
+train: train/images  # train images (relative to 'path') 128 images
+val: validation/images  # val images (relative to 'path') 128 images
+test:  test/test/images # test images (optional)
+
+# Classes (80 DeepFashion2 classes)
+names:
+  0: NaN
+  1: short_sleeved_shirt
+  2: long_sleeved_shirt
+  3: short_sleeved_outwear
+  4: long_sleeved_outwear
+  5: vest
+  6: sling
+  7: shorts
+  8: trousers
+  9: skirt
+  10: short_sleeved_dress
+  11: long_sleeved_dress
+  12: vest_dress
+  13: sling_dress
