@@ -1,48 +1,48 @@
 # Visual Search - 2023 - Object Detection Part
 
-Repo contenant tout le travail d'exploration fait en Aout 2023. Le travail mené jusqu'à ce jour  concerne uniquement la partie 'Object Detection'. Aucun travail n'a encore été effectué concernant la partie 'Similarity Search'. 
+Repository containing all the exploration work done in August 2023. The work carried out up to this day only concerns the 'Object Detection' part. No work has been done yet regarding the 'Similarity Search' part.
 
-Ce repo contient toutes les informations nécessaires pour entrainer des modèles YOLO (v5 ou v8) ou RT-DETR from scratch, en finetuning ou en transfer learning sur un dataset d'images custom dans un objectif de détection des objets.
+This repository contains all the necessary information to train YOLO models (v5 or v8) or RT-DETR from scratch, for fine-tuning or transfer learning on a custom image dataset with the goal of object detection.
  
 
-# Installation de l'environnement
-Pour setup l'environnement : Une fois le repo ayant été cloné :
+# Setup the environment
+Once the repo has been cloned:
 1.  `python -m pip install poetry`
 2.	`poetry install`
 3.	`poetry update`
 
 # Dataset
 
-Le travail d'exploration a été effectué en expérimentant sur le dataset [FashionPedia](https://huggingface.co/datasets/detection-datasets/fashionpedia_4_categories/viewer/detection-datasets--fashionpedia_4_categories/train?row=0), un dataset opensource qui met à disposition environ 47000 images de produits "Fashion" en contexte. La version du dataset considérée ici contient 4 types de produits annotés : `Bags`, `Accessories`, `Clothing`, `Shoes`.
+The exploration work was carried out by experimenting on the dataset [FashionPedia](https://huggingface.co/datasets/detection-datasets/fashionpedia_4_categories/viewer/detection-datasets--fashionpedia_4_categories/train?row=0), An open-source dataset that provides approximately 47,000 'Fashion' product images in context. The version of the dataset considered here contains 4 types of annotated products: `Bags`, `Accessories`, `Clothing`, `Shoes`.
 ![alt-text-1](rm_images/train_examples.png "Example of annotated images in training set")
 
-# Modèles
+# Models
 
-Ce repo se base sur l'API `utralytics` qui permet d'avoir accès à plusieurs architectures de [modèles](https://docs.ultralytics.com/models/) pré-entrainés sur des taches de détection d'objets.
+This repository is based on the `utralytics` API, which provides access to several architectures of pre-trained models for object detection tasks.
 
 ## Yolos
-D'un intérêt particulier a été la gamme [Yolov8](https://docs.ultralytics.com/models/yolov8/), mise à disposition sous plusieurs versions de taille différentes, pré-entrainés sur le dataset COCO.
+Of particular interest: [Yolov8](https://docs.ultralytics.com/models/yolov8/),available with multiple sizes, all pretrained on the COCO open-source dataset.
 ![](rm_images/yolov8_archi.jpeg "Yolov8 available")
 
 
 ![alt-text-1](rm_images/yolo_sizes.png "Yolov8 available")
 
 ## RTDETR
-Des essais ont également été réalisés sur des modèles Transformers [RTDETR](https://docs.ultralytics.com/models/rtdetr/#overview) également disponibles sur la plateforme ultralytics.
+I also conducted trials to incorpore Transformer-based models to my experiments. [RTDETR](https://docs.ultralytics.com/models/rtdetr/#overview) Also available on `ultralytics`API.
 
 ![alt-text-1](rm_images/rtdetr_archi.png "Yolov8 available")
 
-# Configurer les données
+# Processing the data
 
-Il est absolument MANDATOIRE que les données considérées soient au format YOLO. [Cliquez pour en savoir plus](https://docs.ultralytics.com/datasets/detect/)
+It is absolutely MANDATORY for data to be in the YOLO format. [Click for further reading](https://docs.ultralytics.com/datasets/detect/)
 
-Ce format passe par :
-- un agencement du folder de données particuliers (un folder `images/` et `labels/` ainsi qu'un fichier `instances.json` par set de données).
-- la rédaction d'un fichier `config.yaml` qui indique l'ensemble des labels ainsi que les différents PATHS vers les datasets de train, de validation et de test. [EXEMPLE](project_visual_search/data/configs/fashionpedia.yaml)
+This format is made of :
+- a particular folders organization within the data folder (a folder `images/` and `labels/` along with an `instances.json` for each dataset).
+- a `config.yaml` file indicating the set of labels as well as the different PATHS to the training, validation, and test datasets.. [EXAMPLE](project_visual_search/data/configs/fashionpedia.yaml)
 
-## Télécharger FashionPedia depuis HuggingFace
+## Download FashionPedia from HuggingFace
 
-### Images et annotations
+### Images and annotations
 
 ```
 cd project_visual_search/data/fashionpedia
@@ -50,11 +50,11 @@ python fashionpedia_to_coco.py --data_path <DATA_FOLDER> --set train
 python fashionpedia_to_coco.py --data_path <DATA_FOLDER> --set test
 python fashionpedia_to_coco.py --data_path <DATA_FOLDER> --set val
 ```
-Bien préciser à chaque fois: 
-- `data_path` : l'endroit ou vous voulez stocker votre jeu de données, exemple : `/project-visual-search/datasets/fashionpedia`
-- `set` : train, test ou val
+Has to be precised every time: 
+- `data_path` : the path where the data will be stored, example : `/project-visual-search/datasets/fashionpedia`
+- `set` : train, test or val
 
-### Générer les labels en fichier .txt par image
+### Generate labels as .txt files for each image
 
 ```
 cd project_visual_search/data/fashionpedia
@@ -70,44 +70,46 @@ Faire attention de bien générer les labels 3 fois (pour le folder de train, de
 
 
 
-# Entrainement sur dataset custom
+# Training on custom dataset
 
-## Finetuning
+## Fine-tuning
 
-Afin de lancer le finetuning d'un modèle au choix : (Par exemple un yolov8 small)
+To initiate fine-tuning of a chosen model (for example, yolov8 small):
 ```
 python project_visual_search/yolo_v8/finetuning.py --model yolov8s.pt --data_path /data/configs/fashionpedia.yaml --batch_size 32  --epochs 100 --save_period 5 --lr 0.001 
 
 ```
-- le `model` est à choisir parmis `yolov8n.pt`, `yolov8s.pt`, `yolov8m.pt`, `yolov8l.pt`, `yolov8x.pt`. Les poids seront automatiquement téléchargés depuis l'API.
-- le `data_path` doit pointer vers le `.yaml` décrivant le dataset au format YOLO (Nécessaire).
+- Choose the `model` from `yolov8n.pt`, `yolov8s.pt`, `yolov8m.pt`, `yolov8l.pt`, `yolov8x.pt`. The weights will be automatically downloaded from the API.
+- The `data_path` should point to the `.yaml` file describing the dataset in YOLO format (Required).
 
-Pour lancer l'entrainement d'un modèle RTDETR :
+To initiate training of an RTDETR model:
+
 ```
 python project_visual_search/detr/finetuning.py --model rtdetr-l.pt --batch_size 32  --epochs 100 --save_period 5 --lr 0.001 
 
 ```
-le `model` est à choisir parmis `rtdetr-l.pt` et `rtdetr-x.pt`.
-### Résultats 
-A l'issue de l'entrainement un folder contenant tous les résultats, les poids et les logs sera crée dans le dossier `runs/`.
+Choose the `model` from `rtdetr-l.pt` and `rtdetr-x.pt`.
+
+### Results 
+After training, a folder containing all results, weights, and logs will be created in the `runs/` directory.
 
 ![](rm_images/confusion_matrix_normalized.png "Confusion Matrix")
 
-![alt-text-3](rm_images/PR_curve.png "Courbe Precision-Recall")
+![alt-text-3](rm_images/PR_curve.png "Precision-Recall Curve")
 
-## Transfer Learning (freeze quelques couches)
+## Transfer Learning (Freeze Some Layers)
 
-Le même procédé est à effectuer, seulement il faut préciser le nombre de "block" que l'on veut freeze dans notre réseau à l'aide du paramètre `freeze`.
+The same process is to be followed, but specify the number of "blocks" to freeze in our network using the `freeze` parameter.
 
 ```
 python project_visual_search/detr/transfer_learning.py --model rtdetr-l.pt --freeze 20
 
 ```
-**Pour information** le paramètre `freeze` n'est pas inclusif, pour un modèle de 23 modules comme tous les modèles yolo (numérotés sur PyTorch de 0 à 22), paramétrer `--freeze 22` gêlera toutes les layers de 0 à 21. Mais la layer numérotée 22 (la dernière) ne le sera pas.
+**Note** that the `freeze` parameter is not inclusive. For a model with 23 modules like all YOLO models (numbered on PyTorch from 0 to 22), setting `--freeze 22` will freeze all layers from 0 to 21. However, layer numbered 22 (the last one) will not be frozen.
 
-**Concernant les modèles YOLOv8**. La **Detect Head** correspond au dernier module du modèle, donc le numéro 22.
+For YOLOv8 models, the **Detect Head** corresponds to the last module of the model, which is numbered 22.
 
-Voici un aperçu de la taille de la detect head pour chaque taille de YOLO en nombre de paramètres.
+Here is an overview of the size of the detect head for each YOLO size in terms of parameters.
 
 | Yolo    | Total number of Params | Params in the Detect heads |
 | -------- | ------- | --------|
@@ -117,43 +119,42 @@ Voici un aperçu de la taille de la detect head pour chaque taille de YOLO en no
 | Large| 43.6M|  5.6M |
 | XL| 59.4| 8.7M  |
 
-# Evaluer un modèle
+# Evaluate a Model
 
-Pour procéder à la validation d'un modèle YOLO qu'on vient d'entrainer : (identique pour un RTDETR)
+To validate a YOLO model that has just been trained (same for RTDETR):
+
+
 
 ```
 cd project_visual_search/yolo_v8
 python validation.py --run <PATH TO THE MODEL>
 ```
 
-`PATH TO THE MODEL` est par exemple `runs/train2`. Un folder contenant en son sein un dossier `weights` avec les poids acquis lors de l'entrainement. Il n'y a pas besoin de précisier le path du dataset de validation, il a déjà été enregistrer par l'API Ultralytics lors de l'entrainement du modèle (grâce au `config.yaml`).
-
+`PATH TO THE MODEL` is for example `runs/train2`. A folder containing a `weights` sub-folder with the weights obtained during training should be present within. There is no need to specify the path of the validation dataset, as it has already been recorded by the Ultralytics API during model training (thanks to `config.yaml`).
 
 ![](rm_images/exemple_validation.png "VALIDATION")
 
-
-# Générer des prédictions
+# Generate Predictions
 
 ```
 cd project_visual_search/yolo_v8 (ou detr)
 python predict.py --run <RUN NAME> --data_path <IMAGE_FOLDER_PATH> --conf 0.25 --output_dir <DIR_TO_STORE_RESULTS>
  
  ```
- - `run` Tout comme lors de l'évaluation, il faut spécifier le dossier de run correspondant au modèle que l'on veut utiliser pour générer des prédictions.
- - `data_path` Le folder d'images sur lequel on veut générer des prédictions de bounding boxes.
- - `conf` est le seuil de confiance à partir duquel le modèle génère une bounding box.
- - `output_dir` le folder (qui sera crée automatiquement) ou l'on veut stocker les prédictions annotées. exemple : `/home/aka/visual-search/project-visual-search/runs/predict/predictions_1`
+ - `run`: Like during evaluation, you need to specify the run folder corresponding to the model you want to use for generating predictions.
+- `data_path`: The folder of images on which you want to generate bounding box predictions.
+- `conf`: This is the confidence threshold above which the model generates a bounding box.
+- `output_dir`: The folder (which will be created automatically) where you want to store the annotated predictions. Example: `/home/aka/visual-search/project-visual-search/runs/predict/predictions_1`
 
-## Exemple de prédictions générées :
+## Example of generated predictions:
 
  ![](rm_images/pred_generation_1.png "PREDICTION")
-  ![](rm_images/pred_generation_2.png "PREDICTION")
-
+ ![](rm_images/pred_generation_2.png "PREDICTION")
 
 
  # Next steps
 
- - Set up MLFlow pour un meilleur tracking des expériences menées
- - Ajouter de la flexibilité dans la data augmentation utilisée lors du training (step essentiel pour une meilleur performance sur des données test + random)
- 
+ - Set up MLFlow for better experiment tracking.
+ - Add flexibility in the data augmentation used during training (essential step for better performance on test + random data).
+
  
